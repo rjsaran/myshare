@@ -1,0 +1,102 @@
+<!-- index.html -->
+<!doctype html>
+<html ng-app="myShare">
+<head>
+    <title>MY Share</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="javascripts/jquery.js"></script>
+    <script src="javascripts/angular.js"></script>
+    <script src="javascripts/bootstrap.js"></script>
+    <script src="core.js"></script>
+
+    <style>
+        html                    { overflow-y:scroll; }
+        body                    { padding-top:30px;}
+    </style>
+</head>
+
+<body ng-controller="mainController">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Hi,</a>
+            </div>
+    
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" ng-click="logout()" class="glyphicon glyphicon-log-out">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+
+        <div class="page-header text-center">
+            <h1> MY SHARE </h1>
+        </div>
+        <div id="shares-table" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <select class="form-control" ng-options="user.id as user.name for user in users" ng-model="searchable.user_id" >
+                            </select>
+                        </th>
+                        <th>
+                            <select class="form-control" ng-options="month for month in months" ng-model="searchable.month">
+                            </select>
+                        </th>
+                        <th>
+                            <a href=""  ng-click="loadShare()"> Search </a>
+                        </th>
+                        <th>
+                            <a href=""  ng-click="reset()"> reset </a>
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th ng-repeat="head in tHead">
+                            <span >{{head}}</span>
+                        </th>	
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="share in shares">
+                        <td>
+                            <span >{{share.created_at}}</span>
+                        </td>
+                        <td>
+                            <span >{{share.amount}}</span>
+                        </td>
+                        <td>
+                            <span >{{share.user_name}}</span>
+                        </td>
+                        <td>
+                            <span >{{share.description}}</span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success"  ng-click="editShare(share.id)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button> 
+                        </td>
+                        <td>
+                            <button type ="button" class="btn btn-danger" ng-click="deleteShare(share.id)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                             </button> 
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <button type="button" class="btn btn-success" ng-click="addNew()">
+                <span> Add New </span>
+            </button>
+        </div>
+    </div>
+    <div ng-include src="'create.html'"></div>
+    <div ng-include src="'edit.html'"></div>
+</body>
+</html>

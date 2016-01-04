@@ -1,0 +1,73 @@
+'use strict';
+var exec = require('child_process').exec;
+var fs = require('fs');
+var util = require('util');
+var path = require('path');
+var dbConfig = require('../config').db;
+var rint = require('readline').createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+
+console.log('**************************************************************');
+console.log('Connecting to database ' + dbConfig.database + ' on ' + dbConfig.host);
+console.log('THIS WILL WIPE OUT ' + dbConfig.database + '.*@' + dbConfig.host);
+console.log('Press ^C to abort if unsure, enter to continue');
+console.log('**************************************************************');
+
+var mysqlOpts = [];
+
+if(dbConfig.host) {
+	mysqlOpts.push('-h' + dbConfig.host);
+}
+
+if(dbConfig.user) {
+	mysqlOpts.push('-u' + dbConfig.user);
+}
+
+if(dbConfig.password) {
+	mysqlOpts.push('-p' + dbConfig.password);	
+}
+
+if(dbConfig.database) {
+	mysqlOpts.push(dbConfig.database);
+}
+
+var cmd = 'mysql ' + mysqlOpts.join(' ');
+
+function createTable(table, cb) {
+	var command = cmd + ' < resources/db/' + table; 
+	console.log('running command ', command);
+	exec(command, cb);
+}
+
+function initDB(err, tables) {
+	if(err || !tables || !tables.length) {
+		return finalize();
+	}
+	var len = tables.length;
+	tables.forEach(function(table) {
+		createTable(table, function(err) {
+			if(err) {
+				console.log(err);
+				return finalize();
+			}
+			if(--len == 0){
+				return finalize();
+			}
+		});
+	});
+}
+
+function finalize() {
+	process.exit(1);
+}
+
+rint.question('continue?', function (yes) {
+	if(yes == 'yes' || yes == 'y') {
+		console.log('initiating DB...');
+		var dbDir = path.join(__dirname , '../resources/db');
+		fs.readdir(dbDir, initDB);
+	} else { finalize(); }
+});
+

@@ -1,0 +1,63 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html ng-app="login">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>-->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="javascripts/angular.js"></script>
+    <script src="javascripts/jquery.js"></script>
+    <script src="login.js"> </script>
+    <style>
+        html                    { overflow-y:scroll; }
+        body                    { padding-top:30px; }
+    </style>
+</head>
+<body>
+<div class="container" ng-controller="loginController">
+
+<div class="col-sm-6 col-sm-offset-3">
+
+    <h1><span class="fa fa-sign-in"></span> Login</h1>
+    
+    <form>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" class="form-control" ng-model="loginFormData.email" required>
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" class="form-control" ng-model="loginFormData.password" required>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-success btn-lg" ng-click="login()">Login</button>
+    </form>
+    <hr>
+    
+    <h1><span class="fa fa-sign-in"></span> Signup</h1>
+    
+    <form>
+        <div class="form-group">
+            <label>Name:</label>
+            <input type="text" class="form-control"  ng-model="signupFormData.name" required>
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" class="form-control" ng-model="signupFormData.email" required>
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" class="form-control" ng-model="signupFormData.password" required>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-success btn-lg" ng-click="signup()">Signup</button>
+    </form>
+    <hr>
+</div>
+
+</div>
+</body>
+</html>
