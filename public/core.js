@@ -6,7 +6,12 @@ myShare.controller('mainController', function($scope, $http) {
     $scope.isSuccess = false;
     $scope.searchable = {};
     $scope.formData = {};
+    $scope.summaryTotal = 0;
+    $scope.perPerson = 0;
+    $scope.user = {};
+    $scope.isAdmin = false;
     $scope.tHead = ['Date', 'AMOUNT', 'BY', 'DECRIPTION', 'EDIT', 'DELETE'];
+    $scope.summaryThead = ['Name', 'Paid', 'Balance'];
     $scope.months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP','OCT', 'NOV', 'DEC'];
      
     $scope.userList = function() {
@@ -66,14 +71,40 @@ myShare.controller('mainController', function($scope, $http) {
             });
     }
     
+    $scope.getSession = function() {
+        $http.get('/user/session')
+            .success(function(data) {
+                $scope.user = data;
+                $scope.isAdmin = !!data.type;
+                console.log($scope.isAdmin);
+            })
+            .error(function(err, status) {
+            });
+    }
+    
+    $scope.getSession(); 
     $scope.userList();
     $scope.loadShare();
     
-    $scope.loadSummary = function() {
-        $http.get('/share/summary')
-        .success(function(data) {
-            $scope.isSuccess = true;
-            $scope.responseMsg = '';
+    $scope.showSummary = function() {
+        var url = '/share/summary?status=1&';
+        var searchable = $scope.searchable;
+        if(searchable.user_id) {
+            url += 'user_id=' + searchable.user_id + "&";
+        }
+        if(searchable.month) {
+            url += 'month=' + $scope.months.indexOf(searchable.month)
+        }
+        $http.get(url)
+        .success(function(response) {
+            $scope.summaryTotal = response.total;
+            $scope.perPerson = response.perPerson;
+            var summary = response.data;
+            summary.forEach(function(s) {
+                s.user_name =  $scope.userMap[s.user_id].name;
+            });
+            $scope.summary = summary;
+            angular.element('#summaryModal').modal('show');
         })
         .error(function(err, status) {
             // not authorized
@@ -104,7 +135,12 @@ myShare.controller('mainController', function($scope, $http) {
     $scope.editShare =function(id) {
         $scope.shares.forEach(function(share) {
             if(share.id == id) {
-                 $scope.formData = share;     
+                 $scope.formData = {
+                     id: share.id,
+                     description: share.description,
+                     amount: share.amount,
+                     created_at: share.created_at
+                 } 
             }
         });
         angular.element("#editModal").modal('show');

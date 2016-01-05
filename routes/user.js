@@ -63,7 +63,7 @@ user.loginVerify = function(req, res, next) {
 
 user.verify = function(req, res, next) {
 	if(!req.session || !req.session.user || !req.session.user.loggedIn) {
-		return next(new APIError(401, 'please login again to continue', 'RT_UV_4000'))
+		return next(new APIError(401, 'please login again to continue', 'RT_UV_4000'));
 	}
 	return next();
 };
@@ -73,6 +73,7 @@ user.buildSession = function(req, res, next) {
 		name: req.result.name,
 		email: req.result.email,
 		id: req.result.id,
+		type: req.result.type,
 		loggedIn: true
 	};
 	return next();
@@ -98,9 +99,20 @@ user.listResponse = function(req, res, next) {
 	res.json(response);
 };
 
+user.getSession = function(req, res, next) {
+	res.json(req.session && req.session.user);
+};
+
+user.isAdmin = function(req, res, next) {
+	if(!req.session || !req.session.user || !req.session.user.type) {
+		return next(new APIError(411, 'you don\'t have permission ', 'RT_UV_4000'));
+	}
+	return next();
+};
+
 user.response = function(req, res, next) {
 	var response = {};
-	['id', 'name', 'email'].forEach(function(e){
+	['id', 'name', 'email', 'type'].forEach(function(e){
 		if(req.result && req.result[e] !== undefined) {
 			response[e] = req.result[e];
 		}

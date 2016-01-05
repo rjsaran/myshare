@@ -1,0 +1,35 @@
+<div id="summaryModal" class="modal" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Total: {{summaryTotal}} &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Per Person: {{perPerson}}</h3>
+            <h3></h3>
+          </div>
+          <div class="modal-body fix-modal">
+            <table class="table">
+              <thead>
+                <tr>
+                    <th ng-repeat="head in summaryThead">
+                        <span >{{head}}</span>
+                    </th>	
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="summ in summary">
+                  <td>
+                    <span >{{summ.user_name}}</span>
+                  </td>
+                  <td>
+                    <span >{{summ.sum}}</span>
+                  </td>
+                  <td>
+                    <span >{{summ.balance}}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+    </div>
+  </div> 
+</div>

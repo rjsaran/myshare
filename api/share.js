@@ -27,9 +27,15 @@ share.get = function(input, cb) {
 		'to': to,
 		'from': from
 	};
-	
+	options.orderBy = {
+		'created_at': 'asc'
+	}
 	if(input.summary) {
 		options.sum = input.summary;
+	}
+	if(input.group) {
+		options.columns = ['user_id']
+		options.group = input.group;
 	}
 	model.listing(options, function(err, result) {
 		if(err) { return cb(err); }
@@ -37,7 +43,9 @@ share.get = function(input, cb) {
 			return cb(new APIError(450, 'No Entry Found...', 'API_SG_4001'));
 		}
 		result.forEach(function(r) {
-			r.created_at = moment(r.created_at).format('DD-MMM-YYYY HH:MM');
+			if(r.created_at) {
+				r.created_at = moment(r.created_at).format('DD-MMM-YYYY HH:mm');	
+			}
 		})
 		cb(null, result);
 	});
@@ -82,6 +90,11 @@ share.update = function(input, cb) {
 	['description'].forEach(function(e) {
 		if(input[e] !== undefined) { 
 			options[e] = input[e]; 
+		}
+	});
+	['created_at'].forEach(function(e) {
+		if(input[e] !== undefined) { 
+			options[e] = new Date(input[e]); 
 		}
 	});
 	if(!Object.keys(options) || !Object.keys(options).length) {

@@ -2,6 +2,7 @@
 
 var util = require('util');
 var api = require('../api').share;
+var userApi = require('../api/user');
 var debug = require('debug')('routes:share');
 var APIError = require('../lib').APIError;
 
@@ -25,14 +26,58 @@ share.summary = function(req, res, next) {
 	if (req.query && Object.keys(req.query).length) options = req.query;
 	options.summary = 'amount';
 	options.group = 'user_id';
-	api.get(options, function(err, result) {
+	
+	userApi.listing({}, function(err, userResult) {
 		if(err) {
-			debug(err);
-			return next(err || new APIError(403, 'error in fetching summary', 'RT_SS_4001'));
+			return next(err);
 		}
-		req.result = result;
-		return next();
+		var userIds = [];
+		userResult.forEach(function(user) {
+			userIds.push(user.id);
+		})
+		processNext(userIds);
 	});
+	
+	function processNext(userIds) {
+		api.get(options, function(err, result) {
+			if(err) {
+				debug(err);
+				return next(err || new APIError(403, 'error in fetching summary', 'RT_SS_4001'));
+			}
+			var total = 0;
+			var count = userIds && userIds.length;
+			var perPerson = 0;
+			var share_map = {};
+			result.forEach(function(res) {
+				total += res.sum;
+			});
+			perPerson = total /count;
+			perPerson = perPerson.toFixed(2);
+			userIds.forEach(function(uid) {
+				share_map[uid] = {
+					user_id: uid,
+					sum: 0,
+					balance: 0 - perPerson
+				}
+			});
+			result.forEach(function(res) {
+				share_map[res.user_id].sum = res.sum;
+				share_map[res.user_id].balance += res.sum;
+				share_map[res.user_id].balance = (share_map[res.user_id].balance).toFixed(2);
+			});
+			result = [];
+			for(var uid in share_map) {
+				result.push(share_map[uid]);
+			}
+			var response = {
+				total: total,
+				perPerson: perPerson,
+				data: result
+			};
+			req.result = response;
+			return next();
+		});
+	}
 };
 
 share.insert = function(req, res, next) {

@@ -13,9 +13,16 @@ function Model(schema, dbConfig) {
 
 Model.prototype = {
 	listing: function(options, cb) {
+		var self = this;
 		var selectFields = [];
 		if(options.sum) {
-			selectFields = this.table[options.sum].sum().as('sum');
+			if (!util.isArray(options.columns))
+				options.columns = options.columns.split(',');
+			var fields = options.columns.map(function(x) {
+				return self.table[x];
+			});
+			selectFields = fields;
+			selectFields.push(self.table[options.sum].sum().as('sum'));
 		} else {
 			selectFields = this.table.star();
 		}
@@ -31,6 +38,18 @@ Model.prototype = {
 		}
 		if(preparedFilters && preparedFilters.length) {
 			query = query.where(preparedFilters);
+		}
+		if(options.group) {
+			query = query.group(options.group);
+		}
+		if (options.orderBy && (typeof(options.orderBy) === 'object')) {
+			var fields = [];
+			for (var f in options.orderBy) {
+				if (self.table[f])
+					fields.push(self.table[f][options.orderBy[f]]);
+			}
+			if(fields.length)
+				query =  query.order(fields);
 		}
 		query = query.toQuery();
 		debug('[Model:list] ', query);

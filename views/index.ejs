@@ -21,7 +21,7 @@
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Hi,</a>
+                <a class="navbar-brand" href="#">Hi, {{user.name}}</a>
             </div>
     
             <ul class="nav navbar-nav navbar-right">
@@ -30,19 +30,30 @@
         </div>
     </nav>
     <div class="container">
-
         <div class="page-header text-center">
-            <h1> MY SHARE </h1>
+            <h3> MY SHARE </h3>
         </div>
         <div id="shares-table" class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th>
+                            <button type="button" class="btn btn-success" ng-click="addNew()">
+                                <span> Add New </span>
+                            </button>
+                        </th>
+                        <th>
+                            <button type="button" class="btn btn-success" ng-click="showSummary()">
+                                <span> summary </span>
+                            </button>
+                        </th>
+                        <th>
+                            <label> Select Name: </label>
                             <select class="form-control" ng-options="user.id as user.name for user in users" ng-model="searchable.user_id" >
                             </select>
                         </th>
                         <th>
+                            <label> Select Month: </label>
                             <select class="form-control" ng-options="month for month in months" ng-model="searchable.month">
                             </select>
                         </th>
@@ -54,6 +65,7 @@
                         </th>
                     </tr>
                 </thead>
+                <br>
                 <thead>
                     <tr>
                         <th ng-repeat="head in tHead">
@@ -75,12 +87,12 @@
                         <td>
                             <span >{{share.description}}</span>
                         </td>
-                        <td>
-                            <button type="button" class="btn btn-success"  ng-click="editShare(share.id)">
+                        <td ng-if="isAdmin">
+                            <button type="button"  ng-if="isAdmin" class="btn btn-success"  ng-click="editShare(share.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button> 
                         </td>
-                        <td>
+                        <td >
                             <button type ="button" class="btn btn-danger" ng-click="deleteShare(share.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                              </button> 
@@ -89,14 +101,9 @@
                 </tbody>
             </table>
         </div>
-        
-        <div>
-            <button type="button" class="btn btn-success" ng-click="addNew()">
-                <span> Add New </span>
-            </button>
-        </div>
     </div>
     <div ng-include src="'create.html'"></div>
     <div ng-include src="'edit.html'"></div>
+    <div ng-include src="'summary.html'"></div>
 </body>
 </html>

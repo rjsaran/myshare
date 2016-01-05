@@ -11,7 +11,7 @@ function loginController($scope, $http) {
                 if(status == 500) {
                     alert('something bad happened .. try again later ')
                 }
-            })
+            });
     };
     
     checkSession();

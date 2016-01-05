@@ -13,6 +13,7 @@ module.exports = function(app) {
  
   // to get all user list
   app.get('/users/list', user.verify, user.listing, user.listResponse, error);
+  app.get('/user/session', user.getSession, error);
   
   app
   .post('/user/login', user.get, user.loginVerify, user.buildSession, user.response, error)
@@ -25,6 +26,6 @@ module.exports = function(app) {
   .get('/share', user.verify, share.get, share.response, error)
   .get('/share/summary', user.verify, share.summary, share.response, error)
   .post('/share', user.verify, share.insert, share.response, error)
-  .put('/share/:id', user.verify, share.update, share.response, error)
-  .delete('/share/:id', user.verify, share.del, share.response, error);
+  .put('/share/:id', user.verify, user.isAdmin, share.update, share.response, error)
+  .delete('/share/:id', user.verify, user.isAdmin, share.del, share.response, error);
 };
