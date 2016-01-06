@@ -5,10 +5,14 @@
     <title>MY Share</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">-->
     <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/materialize.min.css">
+    <!--<link rel="stylesheet" href="css/font-awesom.css">-->
     <script src="javascripts/jquery.js"></script>
     <script src="javascripts/angular.js"></script>
     <script src="javascripts/bootstrap.js"></script>
+    <script src="javascripts/materialize.min.js"></script>
     <script src="core.js"></script>
 
     <style>
@@ -20,19 +24,19 @@
 <body ng-controller="mainController">
     <nav class="navbar navbar-default">
         <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Hi, {{user.name}}</a>
+            <div class="nav navbar-nav navbar-left">
+                <h6 class="navbar-brand">Hi, {{user.name}}</h6>
             </div>
-    
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#" ng-click="logout()" class="glyphicon glyphicon-log-out">Logout</a></li>
             </ul>
         </div>
     </nav>
     <div class="container">
-        <div class="page-header text-center">
-            <h3> MY SHARE </h3>
-        </div>
+        <div class=" text-center" ng-if="resMessage">
+            <span class="label label-info" ng-show="isSuccess">{{resMessage}}</span>
+            <span class="label label-danger" ng-hide="isSuccess">{{resMessage}}</span>
+         </div>
         <div id="shares-table" class="table-responsive">
             <table class="table">
                 <thead>
@@ -70,6 +74,12 @@
                     <tr>
                         <th ng-repeat="head in tHead">
                             <span >{{head}}</span>
+                        </th>
+                        <th ng-if="isAdmin">
+                            <span >Edit</span>
+                        </th>
+                        <th ng-if="isAdmin">
+                            <span >Delete</span>
                         </th>	
                     </tr>
                 </thead>
@@ -88,11 +98,11 @@
                             <span >{{share.description}}</span>
                         </td>
                         <td ng-if="isAdmin">
-                            <button type="button"  ng-if="isAdmin" class="btn btn-success"  ng-click="editShare(share.id)">
-                                <span class="glyphicon glyphicon-trash"></span>
+                            <button type="button" class="btn btn-success"  ng-click="editShare(share.id)">
+                                <span class="glyphicon glyphicon-edit"></span>
                             </button> 
                         </td>
-                        <td >
+                        <td ng-if="isAdmin">
                             <button type ="button" class="btn btn-danger" ng-click="deleteShare(share.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                              </button> 

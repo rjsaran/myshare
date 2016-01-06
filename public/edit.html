@@ -15,10 +15,6 @@
                   <label>Amount:</label>
                   <input type="text" class="form-control" value="{{formData.amount}}" ng-model="formData.amount" required>
               </div>
-              <div class="form-group">
-                  <label>Date:</label>
-                  <input type="text" class="form-control" value="{{formData.created_at}}" ng-model="formData.created_at" required>
-              </div>
               <br>
               <button type="submit" class="btn btn-success btn-lg" ng-click="updateShare(formData.id)">Update</button>
           </form>

@@ -55,7 +55,7 @@ share.insert = function(input, cb) {
 	var mandatoryFields = ['description', 'user_id', 'amount'];
 	var options = {};
 	var err;
-	['user_id', 'amount', 'status'].forEach(function(e) {
+	['user_id', 'amount', 'status', 'isAmongAll'].forEach(function(e) {
 		if(input[e] !== undefined && !isNaN(Number(input[e]))) { 
 			options[e] = Number(input[e]); 
 		}
@@ -65,6 +65,14 @@ share.insert = function(input, cb) {
 			options[e] = input[e]; 
 		}
 	});
+	['created_at'].forEach(function(e) {
+		if(input[e] !== undefined) {
+			options[e] = new Date(input[e]); 
+		}
+	});
+	if(input.distribute_among && input.distribute_among.length) {
+		options.distribute_among = input.distribute_among.join(',');
+	}
 	mandatoryFields.forEach(function(m) {
 		if(!options[m]) {
 			err = new APIError(409, m + ' is mandatory field', 'API_SI_4001');
@@ -90,11 +98,6 @@ share.update = function(input, cb) {
 	['description'].forEach(function(e) {
 		if(input[e] !== undefined) { 
 			options[e] = input[e]; 
-		}
-	});
-	['created_at'].forEach(function(e) {
-		if(input[e] !== undefined) { 
-			options[e] = new Date(input[e]); 
 		}
 	});
 	if(!Object.keys(options) || !Object.keys(options).length) {

@@ -13,7 +13,7 @@ module.exports = function(app) {
  
   // to get all user list
   app.get('/users/list', user.verify, user.listing, user.listResponse, error);
-  app.get('/user/session', user.getSession, error);
+  app.get('/user/session', user.verify, user.getSession, error);
   
   app
   .post('/user/login', user.get, user.loginVerify, user.buildSession, user.response, error)

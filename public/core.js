@@ -2,7 +2,7 @@
 var myShare = angular.module('myShare', []);
 
 myShare.controller('mainController', function($scope, $http) {
-    $scope.responseMsg = '';
+    $scope.resMessage = '';
     $scope.isSuccess = false;
     $scope.searchable = {};
     $scope.formData = {};
@@ -10,11 +10,12 @@ myShare.controller('mainController', function($scope, $http) {
     $scope.perPerson = 0;
     $scope.user = {};
     $scope.isAdmin = false;
-    $scope.tHead = ['Date', 'AMOUNT', 'BY', 'DECRIPTION', 'EDIT', 'DELETE'];
+    $scope.users = {};
+    $scope.tHead = ['Date', 'AMOUNT', 'BY', 'DESCRIPTION'];
     $scope.summaryThead = ['Name', 'Paid', 'Balance'];
     $scope.months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP','OCT', 'NOV', 'DEC'];
      
-    $scope.userList = function() {
+    var userList = function(cb) {
             $http.get('/users/list')
             .success(function(data) {
                 $scope.users = [];
@@ -22,16 +23,25 @@ myShare.controller('mainController', function($scope, $http) {
                 for(var id in data) {
                     $scope.users.push(data[id]);
                 }
+                return cb();
             })
             .error(function(err, status) {
-                switch (status) {
-                    case 401:
-                        window.location = '/login';
-                        break;
-                    case 450:
-                        $scope.users = {};
-                        break;
-                }
+                $scope.users = {};
+                return cb();
+            });
+    }
+    
+    
+    var getSession = function(cb) {
+        $http.get('/user/session')
+            .success(function(data) {
+                $scope.user = data;
+                $scope.isAdmin = !!data.type;
+                return cb();
+            })
+            .error(function(err, status) {
+                $scope.user = {};
+                return cb();
             });
     }
                
@@ -45,13 +55,21 @@ myShare.controller('mainController', function($scope, $http) {
             url += 'month=' + $scope.months.indexOf(searchable.month)
         }
         $http.get(url)
-            .success(function(data) {
-                data.forEach(function(d) {
-                   d.user_name =  $scope.userMap[d.user_id].name;
-                });
-                $scope.shares = data || {};
-                $scope.isSuccess = true;
-                $scope.responseMsg = '';
+            .success(function(data) {   
+                 
+                getSession(function() {
+                    userList(function() {
+                        processFurther();
+                    });
+                }); 
+                function processFurther() {
+                    data.forEach(function(d) {
+                        d.user_name =  $scope.userMap[d.user_id].name;
+                    });
+                    $scope.shares = data || {};
+                    $scope.isSuccess = true;
+                    $scope.resMessage = '';   
+                }
             })
             .error(function(err, status) {
                 // not authorized
@@ -61,31 +79,21 @@ myShare.controller('mainController', function($scope, $http) {
                         window.location = '/login';
                         break;
                     case 450:
-                        $scope.shares = {};
-                        $scope.responseMsg = '';
+                        getSession(function() {
+                            userList(function() {
+                                 $scope.shares = {};
+                                 $scope.resMessage = 'No share Found....';
+                            });
+                        }); 
                         break;
                     default:
-                        $scope.responseMsg = err.error;
+                        $scope.resMessage = err.error;
                         break;
                 }
             });
     }
     
-    $scope.getSession = function() {
-        $http.get('/user/session')
-            .success(function(data) {
-                $scope.user = data;
-                $scope.isAdmin = !!data.type;
-                console.log($scope.isAdmin);
-            })
-            .error(function(err, status) {
-            });
-    }
-    
-    $scope.getSession(); 
-    $scope.userList();
     $scope.loadShare();
-    
     $scope.showSummary = function() {
         var url = '/share/summary?status=1&';
         var searchable = $scope.searchable;
@@ -97,6 +105,7 @@ myShare.controller('mainController', function($scope, $http) {
         }
         $http.get(url)
         .success(function(response) {
+            $scope.isSuccess = true;
             $scope.summaryTotal = response.total;
             $scope.perPerson = response.perPerson;
             var summary = response.data;
@@ -114,10 +123,10 @@ myShare.controller('mainController', function($scope, $http) {
                     window.location = '/login';
                     break;
                 case 450:  
-                     $scope.responseMsg = ''
+                     $scope.resMessage = 'No Summary Found'
                      break;
                 default:
-                     $scope.responseMsg = err.error;
+                     $scope.resMessage = err.error;
                      break;
             }
         });
@@ -151,8 +160,10 @@ myShare.controller('mainController', function($scope, $http) {
         var data = $scope.formData;
         $http.post('/share', data)
             .success(function(data) {
+                $scope.isSuccess = true;
                 $scope.formData = {}; 
-                angular.element('#createModal').modal('hide'); 
+                angular.element('#createModal').modal('hide');
+                $scope.resMessage = 'Share Created Succesfully....';
                 $scope.formData = {};
                 $scope.loadShare(); 
             })
@@ -164,7 +175,7 @@ myShare.controller('mainController', function($scope, $http) {
                         window.location = '/login';
                         break;
                     default:
-                        $scope.responseMsg = err.error;
+                        $scope.resMessage = err.error;
                         break;
                 }
             });
@@ -175,8 +186,10 @@ myShare.controller('mainController', function($scope, $http) {
         var data = $scope.formData;
         $http.put('/share/' + id, data)
             .success(function(data) {
+               $scope.isSuccess = true;
                angular.element('#editModal').modal('hide'); 
                $scope.formData = {};
+               $scope.resMessage = 'Share Updated Succesfully....';
                $scope.loadShare();
             })
             .error(function(err, status) {
@@ -187,7 +200,7 @@ myShare.controller('mainController', function($scope, $http) {
                         window.location = '/login';
                         break;
                     default:
-                        $scope.responseMsg = err.error;
+                        $scope.resMessage = err.error;
                         break;
                 }
             });
@@ -202,7 +215,7 @@ myShare.controller('mainController', function($scope, $http) {
                 });
                 $scope.shares = shares;
                 $scope.isSuccess = true;
-                $scope.responseMsg = 'share deleted successfully..'
+                $scope.resMessage = 'share deleted successfully..'
             })
             .error(function(err, status) {
                 // not authorized
@@ -211,14 +224,20 @@ myShare.controller('mainController', function($scope, $http) {
                     case 401:
                         window.location = '/login';
                         break;
-                    case 450:
-                        $scope.responseMsg = '';
-                        break;
                     default:
-                        $scope.responseMsg = err.error;
+                        $scope.resMessage = err.error;
                         break;
                 }
             });
+    };
+    
+    $scope.toggleAll = function() {
+        var users = $scope.users
+        $scope.formData.selectedUser = {};
+        users.forEach(function(user) {
+            var uid = user.id;
+            $scope.formData.selectedUser[uid] = !!$scope.formData.selectedUserAll; 
+        });
     };
     
     $scope.logout = function() {

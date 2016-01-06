@@ -24,8 +24,6 @@ share.get = function(req, res, next) {
 share.summary = function(req, res, next) {
 	var options = {};
 	if (req.query && Object.keys(req.query).length) options = req.query;
-	options.summary = 'amount';
-	options.group = 'user_id';
 	
 	userApi.listing({}, function(err, userResult) {
 		if(err) {
@@ -44,26 +42,33 @@ share.summary = function(req, res, next) {
 				debug(err);
 				return next(err || new APIError(403, 'error in fetching summary', 'RT_SS_4001'));
 			}
-			var total = 0;
-			var count = userIds && userIds.length;
-			var perPerson = 0;
-			var share_map = {};
-			result.forEach(function(res) {
-				total += res.sum;
-			});
-			perPerson = total /count;
-			perPerson = perPerson.toFixed(2);
+			var share_map = {},
+				total = 0;
 			userIds.forEach(function(uid) {
 				share_map[uid] = {
 					user_id: uid,
 					sum: 0,
-					balance: 0 - perPerson
+					balance: 0
 				}
 			});
 			result.forEach(function(res) {
-				share_map[res.user_id].sum = res.sum;
-				share_map[res.user_id].balance += res.sum;
-				share_map[res.user_id].balance = (share_map[res.user_id].balance).toFixed(2);
+				total += res.amount;
+			});
+			result.forEach(function(res) {
+				var distribute_among = res.isAmongAll ? userIds : res.distribute_among.split(',').map(Number);
+				if(distribute_among.indexOf(res.user_id) > -1) {
+					distribute_among.push(Number(res.user_id));
+				}
+				var count = distribute_among.length;
+				var perPerson = res.amount / count;
+				share_map[res.user_id].sum += res.amount;
+				distribute_among.forEach(function(uid) {
+					if(uid == res.user_id) {
+						share_map[uid].balance += res.amount - perPerson;
+					} else {
+						share_map[uid].balance -= perPerson;
+					}
+				});
 			});
 			result = [];
 			for(var uid in share_map) {
@@ -71,7 +76,6 @@ share.summary = function(req, res, next) {
 			}
 			var response = {
 				total: total,
-				perPerson: perPerson,
 				data: result
 			};
 			req.result = response;
@@ -86,6 +90,20 @@ share.insert = function(req, res, next) {
 	}
 	var input = req.body;
 	input.user_id = req.session.user.id;
+	var isSelectedUserAll = !!input.selectedUserAll;
+	var selectedUserMap = input.selectedUser;
+	var selectedUsers = [];
+	
+	if(!isSelectedUserAll && selectedUserMap) {
+		for(var uid in selectedUserMap) {
+			if(selectedUserMap[uid])
+			selectedUsers.push(uid);
+		}
+	}
+	
+	input.isAmongAll = isSelectedUserAll;
+	input.distribute_among = selectedUsers;
+	
 	api.insert(input, function(err, result) {
 		if(err) {
 			debug(err);

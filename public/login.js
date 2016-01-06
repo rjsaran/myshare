@@ -1,6 +1,6 @@
 var login = angular.module('login', []);
 
-function loginController($scope, $http) {
+login.controller('loginController', function($scope, $http) {
     
     function checkSession() {
         $http.post('/user/checkSession') 
@@ -43,4 +43,4 @@ function loginController($scope, $http) {
                 }
             });
     };
-}
+});
