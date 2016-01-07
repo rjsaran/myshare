@@ -34,8 +34,8 @@
     </nav>
     <div class="container">
         <div class=" text-center" ng-if="resMessage">
-            <span class="label label-info" ng-show="isSuccess">{{resMessage}}</span>
-            <span class="label label-danger" ng-hide="isSuccess">{{resMessage}}</span>
+            <h3  style="color:green" ng-show="isSuccess">{{resMessage}}</h3>
+            <h3 style="color:red" ng-hide="isSuccess">{{resMessage}}</h3>
          </div>
         <div id="shares-table" class="table-responsive">
             <table class="table">
