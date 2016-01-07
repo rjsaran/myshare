@@ -56,17 +56,20 @@ share.summary = function(req, res, next) {
 			});
 			result.forEach(function(res) {
 				var distribute_among = res.isAmongAll ? userIds : res.distribute_among.split(',').map(Number);
-				if(distribute_among.indexOf(res.user_id) > -1) {
+				if(distribute_among.indexOf(Number(res.user_id)) === -1) {
 					distribute_among.push(Number(res.user_id));
 				}
 				var count = distribute_among.length;
-				var perPerson = res.amount / count;
-				share_map[res.user_id].sum += res.amount;
+				var amount = Number(res.amount);
+				var perPerson = Math.round(amount / count);
+				share_map[res.user_id].sum += amount;
 				distribute_among.forEach(function(uid) {
-					if(uid == res.user_id) {
-						share_map[uid].balance += res.amount - perPerson;
-					} else {
-						share_map[uid].balance -= perPerson;
+					if(userIds.indexOf(uid) > -1) {
+						if(uid == res.user_id) {
+							share_map[uid].balance += amount - perPerson;
+						} else {
+							share_map[uid].balance -= perPerson;
+						}
 					}
 				});
 			});
