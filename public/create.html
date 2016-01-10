@@ -9,25 +9,25 @@
             <form>
               <div class="form-group">
                   <label>Description:</label>
-                  <input type="text" class="form-control" ng-model="formData.description" required>
+                  <input type="text" class="form-control" ng-model="newformData.description" required>
               </div>
               <div class="form-group">
                   <label>Amount:</label>
-                  <input type="text" class="form-control" ng-model="formData.amount" required>
+                  <input type="text" class="form-control" ng-model="newformData.amount" required>
               </div>
               <div class="form-group">
                   <label>Date:</label>
-                  <input type="text" class="form-control" ng-model="formData.created_at">
+                  <input type="text" class="form-control" ng-model="newformData.created_at">
               </div>
               <label> Distribute Among: </label>
               <br>
               <div class="form-group">
-                <input type="checkbox" ng-click="toggleAll()" ng-model="formData.selectedUserAll">
+                <input type="checkbox" ng-click="toggleAll()" ng-model="newformData.selectedUserAll">
                 <span>all</span>
               </div>
               <div ng-repeat="user in users">
                 <div class="form-group">
-                    <input type="checkbox"  ng-model="formData.selectedUser[user.id]">
+                    <input type="checkbox"  ng-model="newformData.selectedUser[user.id]">
                     <span>{{user.name}}</span>
                 </div>
               </div>

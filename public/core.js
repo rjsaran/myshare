@@ -147,9 +147,8 @@ myShare.controller('mainController', function($scope, $http) {
                  $scope.formData = {
                      id: share.id,
                      description: share.description,
-                     amount: share.amount,
-                     created_at: share.created_at
-                 } 
+                     amount: share.amount
+                 }
             }
         });
         angular.element("#editModal").modal('show');
@@ -157,14 +156,13 @@ myShare.controller('mainController', function($scope, $http) {
     
     // when submitting the add form, send the text to the node API
     $scope.createShare = function() {
-        var data = $scope.formData;
+        var data = $scope.newformData;
         $http.post('/share', data)
             .success(function(data) {
                 $scope.isSuccess = true;
-                $scope.formData = {}; 
                 angular.element('#createModal').modal('hide');
                 $scope.resMessage = 'Share Created Succesfully....';
-                $scope.formData = {};
+                $scope.newformData = {};
                 $scope.loadShare(); 
             })
             .error(function(err, status) {
