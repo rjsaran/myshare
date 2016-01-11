@@ -1,11 +1,13 @@
 'use strict';
 var myShare = angular.module('myShare', []);
 
-myShare.controller('mainController', function($scope, $http) {
+myShare.controller('mainController', function($scope, $http, $timeout) {
+    var resMessage;
     $scope.resMessage = '';
     $scope.isSuccess = false;
     $scope.searchable = {};
     $scope.formData = {};
+    $scope.newformData = {};
     $scope.summaryTotal = 0;
     $scope.perPerson = 0;
     $scope.user = {};
@@ -31,7 +33,11 @@ myShare.controller('mainController', function($scope, $http) {
             });
     }
     
-    
+    function clearResMessage() {
+        $timeout(function() {
+            $scope.resMessage = '';
+        }, 5000);
+    }
     var getSession = function(cb) {
         $http.get('/user/session')
             .success(function(data) {
@@ -45,7 +51,7 @@ myShare.controller('mainController', function($scope, $http) {
             });
     }
                
-    $scope.loadShare = function() {
+    $scope.loadShare = function(cb) {
         var url = '/share?status=1&';
         var searchable = $scope.searchable;
         if(searchable.user_id) {
@@ -68,7 +74,8 @@ myShare.controller('mainController', function($scope, $http) {
                     });
                     $scope.shares = data || {};
                     $scope.isSuccess = true;
-                    $scope.resMessage = '';   
+                    $scope.resMessage = resMessage || '';
+                    resMessage = '';
                 }
             })
             .error(function(err, status) {
@@ -161,9 +168,10 @@ myShare.controller('mainController', function($scope, $http) {
             .success(function(data) {
                 $scope.isSuccess = true;
                 angular.element('#createModal').modal('hide');
-                $scope.resMessage = 'Share Created Succesfully....';
                 $scope.newformData = {};
-                $scope.loadShare(); 
+                $scope.loadShare();
+                resMessage = 'Share Created Succesfully....';
+                clearResMessage();
             })
             .error(function(err, status) {
                 // not authorized
@@ -187,8 +195,9 @@ myShare.controller('mainController', function($scope, $http) {
                $scope.isSuccess = true;
                angular.element('#editModal').modal('hide'); 
                $scope.formData = {};
-               $scope.resMessage = 'Share Updated Succesfully....';
                $scope.loadShare();
+               resMessage = 'Share Updated Succesfully....';
+               clearResMessage();
             })
             .error(function(err, status) {
                 // not authorized
@@ -206,35 +215,41 @@ myShare.controller('mainController', function($scope, $http) {
     
     // delete  a todo
     $scope.deleteShare = function(id) {
-        $http.delete('/share/' + id)
-            .success(function(data) {
-                var shares = $scope.shares.filter(function(share) {
-                    return share.id != data.id;
+        if(confirm('Are You Sure?')) {
+            _deleteShare();
+        }
+        function _deleteShare() {
+            $http.delete('/share/' + id)
+                .success(function(data) {
+                    var shares = $scope.shares.filter(function(share) {
+                        return share.id != data.id;
+                    });
+                    $scope.shares = shares;
+                    $scope.isSuccess = true;
+                    $scope.resMessage = 'share deleted successfully..'
+                    clearResMessage();
+                })
+                .error(function(err, status) {
+                    // not authorized
+                    $scope.isSuccess = false;
+                     switch (status) {
+                        case 401:
+                            window.location = '/login';
+                            break;
+                        default:
+                            $scope.resMessage = err.error;
+                            break;
+                    }
                 });
-                $scope.shares = shares;
-                $scope.isSuccess = true;
-                $scope.resMessage = 'share deleted successfully..'
-            })
-            .error(function(err, status) {
-                // not authorized
-                $scope.isSuccess = false;
-                 switch (status) {
-                    case 401:
-                        window.location = '/login';
-                        break;
-                    default:
-                        $scope.resMessage = err.error;
-                        break;
-                }
-            });
+        }
     };
     
     $scope.toggleAll = function() {
         var users = $scope.users
-        $scope.formData.selectedUser = {};
+        $scope.newformData.selectedUser = {};
         users.forEach(function(user) {
             var uid = user.id;
-            $scope.formData.selectedUser[uid] = !!$scope.formData.selectedUserAll; 
+            $scope.newformData.selectedUser[uid] = !!$scope.newformData.selectedUserAll;
         });
     };
     
