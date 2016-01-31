@@ -27,11 +27,11 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 }
                 return cb();
             })
-            .error(function(err, status) {
+            .error(function() {
                 $scope.users = {};
                 return cb();
             });
-    }
+    };
     
     function clearResMessage() {
         $timeout(function() {
@@ -45,21 +45,23 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 $scope.isAdmin = !!data.type;
                 return cb();
             })
-            .error(function(err, status) {
+            .error(function() {
                 $scope.user = {};
                 return cb();
             });
-    }
+    };
                
-    $scope.loadShare = function(cb) {
+    $scope.loadShare = function() {
         var url = '/share?status=1&';
         var searchable = $scope.searchable;
         if(searchable.user_id) {
             url += 'user_id=' + searchable.user_id + "&";
         }
-        if(searchable.month) {
-            url += 'month=' + $scope.months.indexOf(searchable.month)
-        }
+        var now = new Date();
+        var currentMonth = $scope.months[now.getMonth()];
+        searchable.month = searchable.month || currentMonth;
+        url += 'month=' + $scope.months.indexOf(searchable.month);
+
         $http.get(url)
             .success(function(data) {   
                  
@@ -89,7 +91,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                         getSession(function() {
                             userList(function() {
                                  $scope.shares = {};
-                                 $scope.resMessage = 'No share Found....';
+                                 $scope.resMessage = 'No share Found For ' + searchable.month + ' Month..';
                             });
                         }); 
                         break;
@@ -98,7 +100,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                         break;
                 }
             });
-    }
+    };
     
     $scope.loadShare();
     $scope.showSummary = function() {
@@ -108,7 +110,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
             url += 'user_id=' + searchable.user_id + "&";
         }
         if(searchable.month) {
-            url += 'month=' + $scope.months.indexOf(searchable.month)
+            url += 'month=' + $scope.months.indexOf(searchable.month);
         }
         $http.get(url)
         .success(function(response) {
@@ -120,6 +122,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 s.user_name =  $scope.userMap[s.user_id].name;
             });
             $scope.summary = summary;
+            $scope.resMessage = '';
             angular.element('#summaryModal').modal('show');
         })
         .error(function(err, status) {
@@ -130,23 +133,23 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                     window.location = '/login';
                     break;
                 case 450:  
-                     $scope.resMessage = 'No Summary Found'
+                     $scope.resMessage = 'No Summary Found';
                      break;
                 default:
                      $scope.resMessage = err.error;
                      break;
             }
         });
-    }
+    };
     
     $scope.reset = function() {
         $scope.searchable = {};  
         $scope.loadShare();  
-    }
+    };
     
     $scope.addNew = function() {
         angular.element('#createModal').modal('show');
-    }
+    };
     
     $scope.editShare =function(id) {
         $scope.shares.forEach(function(share) {
@@ -155,17 +158,17 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                      id: share.id,
                      description: share.description,
                      amount: share.amount
-                 }
+                 };
             }
         });
         angular.element("#editModal").modal('show');
-    }
+    };
     
     // when submitting the add form, send the text to the node API
     $scope.createShare = function() {
         var data = $scope.newformData;
         $http.post('/share', data)
-            .success(function(data) {
+            .success(function() {
                 $scope.isSuccess = true;
                 angular.element('#createModal').modal('hide');
                 $scope.newformData = {};
@@ -191,7 +194,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     $scope.updateShare = function(id) {
         var data = $scope.formData;
         $http.put('/share/' + id, data)
-            .success(function(data) {
+            .success(function() {
                $scope.isSuccess = true;
                angular.element('#editModal').modal('hide'); 
                $scope.formData = {};
@@ -226,7 +229,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                     });
                     $scope.shares = shares;
                     $scope.isSuccess = true;
-                    $scope.resMessage = 'share deleted successfully..'
+                    $scope.resMessage = 'share deleted successfully..';
                     clearResMessage();
                 })
                 .error(function(err, status) {
@@ -245,7 +248,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     };
     
     $scope.toggleAll = function() {
-        var users = $scope.users
+        var users = $scope.users;
         $scope.newformData.selectedUser = {};
         users.forEach(function(user) {
             var uid = user.id;
@@ -255,11 +258,11 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     
     $scope.logout = function() {
         $http.post('/user/logout')
-            .success(function(data) {
+            .success(function() {
                 window.location = '/login';
             })
-            .error(function(err, status) {
-                window.location = '/login'
+            .error(function() {
+                window.location = '/login';
             });
     };
 

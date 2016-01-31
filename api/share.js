@@ -17,8 +17,9 @@ share.get = function(input, cb) {
 			options.filters[e] = Number(input[e]); 
 		}
 	});
-	var month = input.month && Number(input.month) || moment().month();
 	
+	var month = input.month && !isNaN(input.month) ? Number(input.month) : moment().month();
+
 	var from = moment().startOf('year').add(month, 'month').toDate(); 
 	var to = moment().startOf('year').add(month + 1, 'month').subtract(1, 'second').toDate();
 	
