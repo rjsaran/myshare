@@ -63,16 +63,18 @@ user.add = function(input, cb) {
 			options[e] = input[e]; 
 		}
 	});
-	mandatoryFields.forEach(function(m) {
-		if(!options[m]) {
-			err = new APIError(409, m + ' is mandatory field', 'API_UA_4001');
+	for(var i in mandatoryFields) {
+		var mField = mandatoryFields[i];
+		if(!options[mField]) {
+			err = new APIError(409, mField + ' is mandatory field', 'API_UA_4001');
+			return cb(err);
 		}
-	});
+	}
 	if(options.password) {
 		var originalPassword = options.password;
 		options.password = hash.encrypt(options.password);
 	}
-	if(err) { return cb(err); }
+
 	model.insert(options, function(err, result) {
 		if(err) {return cb(err); }
 		options.id = result && result.insertId;

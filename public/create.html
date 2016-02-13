@@ -6,18 +6,26 @@
             <h3>Create Share</h3>
           </div>
           <div class="modal-body fix-modal">
-            <form>
-              <div class="form-group">
+            <form name="createForm">
+              <div class="form-group" ng-class="{ 'has-error': createForm.description.$invalid }">
                   <label>Description:</label>
-                  <input type="text" class="form-control" ng-model="newformData.description" required>
+                  <input name="description" type="text" class="form-control" ng-model="newformData.description" required>
+                  <p ng-show="createForm.description.$invalid" class="help-block">Please Enter Description.</p>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-class="{ 'has-error': createForm.amount.$invalid }">
                   <label>Amount:</label>
-                  <input type="text" class="form-control" ng-model="newformData.amount" required>
+                  <input  name="amount" type="text" class="form-control" ng-model="newformData.amount" required>
+                  <p ng-show="createForm.amount.$invalid" class="help-block">Please Enter Amount.</p>
               </div>
-              <div class="form-group">
-                  <label>Date:</label>
-                  <input type="text" class="form-control" ng-model="newformData.created_at">
+              <div class="row">
+                <div class="col-md-6">
+                  <p class="input-group">
+                    <input type="text" class="form-control" uib-datepicker-popup="{{datePicker.format}}" ng-model="newformData.created_at" is-open="datePicker.isPopupOpened" datepicker-options="datePicker.dateOptions" close-text="Close" />
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="datePicker.openModal()"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                  </p>
+                </div>
               </div>
               <label> Distribute Among: </label>
               <br>
@@ -32,7 +40,7 @@
                 </div>
               </div>
               <br>
-              <button type="submit" class="btn btn-success btn-lg" ng-click="createShare()">Add</button>
+              <button type="submit" class="btn btn-success btn-lg" ng-disabled="createForm.$invalid" ng-click="createForm.$valid && createShare()">Add</button>
           </form>
         </div>
     </div>

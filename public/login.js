@@ -2,6 +2,10 @@ var login = angular.module('login', []);
 
 login.controller('loginController', function($scope, $http) {
     
+    $scope.responseMsgs = {
+        signup: '',
+        login: ''
+    };
     function checkSession() {
         $http.post('/user/checkSession') 
             .success(function(data) {
@@ -19,27 +23,27 @@ login.controller('loginController', function($scope, $http) {
     $scope.signup = function() {
         $http.post('/user/signup', $scope.signupFormData)
             .success(function(data) {
+                $scope.responseMsgs = {};
                 window.location = '/';
             })
             .error(function(err, status) {
-                alert(err.error || 'please try again later');
-                $scope.responseMsg = err.error;
+                $scope.responseMsgs.signup = err.error || 'please try again later.';
             });
     };
 
     $scope.login = function() {
         $http.post('/user/login', $scope.loginFormData)
             .success(function(data) {
+                $scope.responseMsgs = {};
                 window.location = '/';
             })
             .error(function(err, status) {
                 switch(status) {
                     case 450:
-                        alert('Look like first time user... please register to continue..');
+                        $scope.responseMsgs.login = 'Please Register Before Login.';
                         break;
                     default:
-                        alert(err.error || 'please try again later');
-                        $scope.responseMsg = err.error;                       
+                        $scope.responseMsgs.login = err.error || 'please try again later.';
                 }
             });
     };

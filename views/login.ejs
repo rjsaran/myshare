@@ -20,37 +20,48 @@
 
     <h1><span class="fa fa-sign-in"></span> Login</h1>
     
-    <form>
-        <div class="form-group">
+    <form name="loginForm">
+        <div class="form-group" ng-class="{ 'has-error': loginForm.email.$invalid }">
             <label>Email:</label>
-            <input type="email" class="form-control" ng-model="loginFormData.email" required>
+            <input name="email" type="email" class="form-control" ng-model="loginFormData.email" required>
+            <p ng-show="loginForm.email.$invalid" class="help-block">Please Enter Valid Email Address.</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': loginForm.password.$invalid }">
             <label>Password:</label>
-            <input type="password" class="form-control" ng-model="loginFormData.password" required>
+            <input name="password" type="password" class="form-control" ng-model="loginFormData.password" required>
+            <p ng-show="loginForm.password.$invalid" class="help-block">password is required.</p>
         </div>
+        <p ng-show="responseMsgs.login" style="color:red" class="help-block">{{responseMsgs.login}}</p>
         <br>
-        <button type="submit" class="btn btn-success btn-lg" ng-click="login()">Login</button>
+        <button type="submit" class="btn btn-success btn-lg" ng-disabled="loginForm.$invalid" ng-click="loginForm.$valid && login()">Login</button>
     </form>
     <hr>
     
     <h1><span class="fa fa-sign-in"></span> Signup</h1>
     
-    <form>
-        <div class="form-group">
+    <form name="signupForm">
+        <div class="form-group" ng-class="{ 'has-error': signupForm.name.$invalid }">
             <label>Name:</label>
-            <input type="text" class="form-control"  ng-model="signupFormData.name" required>
+            <input name="name" type="text" class="form-control"  ng-model="signupFormData.name" required>
+            <p ng-show="signupForm.name.$invalid" class="help-block">name is required.</p>
+
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': signupForm.email.$invalid }">
             <label>Email:</label>
-            <input type="email" class="form-control" ng-model="signupFormData.email" required>
+            <input name="email" type="email" class="form-control" ng-model="signupFormData.email" required>
+             <p ng-show="signupForm.email.$invalid" class="help-block">Please Enter Valid Email Address.</p>
+
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': signupForm.password.$invalid }">
             <label>Password:</label>
-            <input type="password" class="form-control" ng-model="signupFormData.password" required>
+            <input name="password" type="password" class="form-control" ng-model="signupFormData.password" ng-minlength="4" ng-maxlength="10" required>
+            <p ng-show="signupForm.password.$error.minlength" class="help-block">password is too short.</p>
+            <p ng-show="signupForm.password.$error.maxlength" class="help-block">password is too long.</p>
         </div>
+         <p ng-show="responseMsgs.signup" style="color:red" class="help-block">{{responseMsgs.signup}}</p>
         <br>
-        <button type="submit" class="btn btn-success btn-lg" ng-click="signup()">Signup</button>
+        <br>
+        <button type="submit" class="btn btn-success btn-lg" ng-disabled="signupForm.$invalid" ng-click="signupForm.$valid && signup()">Signup</button>
     </form>
     <hr>
 </div>

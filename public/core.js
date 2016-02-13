@@ -1,5 +1,5 @@
 'use strict';
-var myShare = angular.module('myShare', []);
+var myShare = angular.module('myShare', ['ngAnimate', 'ui.bootstrap']);
 
 myShare.controller('mainController', function($scope, $http, $timeout) {
     var resMessage;
@@ -17,7 +17,26 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     $scope.summaryThead = ['Name', 'Paid', 'Balance'];
     $scope.months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP','OCT', 'NOV', 'DEC'];
      
-    var userList = function(cb) {
+    $scope.datePicker = {};
+
+    $scope.datePicker.today = function() {
+      $scope.newformData.created_at = new Date();
+    };
+    $scope.datePicker.clear = function() {
+      $scope.newformData.created_at = null;
+    };
+    $scope.datePicker.openModal = function() {
+      $scope.datePicker.isPopupOpened = true;
+    };
+    $scope.datePicker.dateOptions = {
+      formatYear: 'yy',
+      startingDay: 1
+    };
+
+    $scope.datePicker.format = 'dd-MMMM-yyyy';
+    $scope.datePicker.isPopupOpened = false;
+
+    function userList(cb) {
             $http.get('/users/list')
             .success(function(data) {
                 $scope.users = [];
@@ -31,14 +50,15 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 $scope.users = {};
                 return cb();
             });
-    };
-    
+    }
+
     function clearResMessage() {
         $timeout(function() {
             $scope.resMessage = '';
         }, 5000);
     }
-    var getSession = function(cb) {
+
+    function getSession(cb) {
         $http.get('/user/session')
             .success(function(data) {
                 $scope.user = data;
@@ -49,8 +69,13 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 $scope.user = {};
                 return cb();
             });
-    };
-               
+    }
+    
+    function loadDatePicker(cb) {
+      $scope.datePicker.today();
+      return cb();
+    }
+
     $scope.loadShare = function() {
         var url = '/share?status=1&';
         var searchable = $scope.searchable;
@@ -72,7 +97,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
                 }); 
                 function processFurther() {
                     data.forEach(function(d) {
-                        d.user_name =  $scope.userMap[d.user_id].name;
+                        d.user_name = $scope.userMap && $scope.userMap[d.user_id] && $scope.userMap[d.user_id].name;
                     });
                     $scope.shares = data || {};
                     $scope.isSuccess = true;
@@ -119,7 +144,7 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
             $scope.perPerson = response.perPerson;
             var summary = response.data;
             summary.forEach(function(s) {
-                s.user_name =  $scope.userMap[s.user_id].name;
+                s.user_name = $scope.userMap && $scope.userMap[s.user_id] && $scope.userMap[s.user_id].name;
             });
             $scope.summary = summary;
             $scope.resMessage = '';
@@ -148,10 +173,13 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     };
     
     $scope.addNew = function() {
-        angular.element('#createModal').modal('show');
+        $scope.newformData = {};
+        loadDatePicker(function() {
+            angular.element('#createModal').modal('show');
+        })
     };
     
-    $scope.editShare =function(id) {
+    $scope.editShare = function(id) {
         $scope.shares.forEach(function(share) {
             if(share.id == id) {
                  $scope.formData = {

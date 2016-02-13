@@ -12,7 +12,7 @@ user.addnew = function(req, res, next) {
 	}
 	api.add(req.body, function(err, result) {
 		if(err && err.message.indexOf('ER_DUP_ENTRY') !== -1) {
-			return next(new APIError(400, 'User name already present .. try different name', 'RT_UA_4000'))
+			return next(new APIError(400, 'User name already present. try different name', 'RT_UA_4000'))
 		}
 		if(err) {
 			debug(err);
@@ -47,7 +47,7 @@ user.get = function(req, res, next) {
 	api.get(options, function(err, result) {
 		if(err) {
 			debug(err);
-			return next(err || new APIError(403, 'error in fetching user.. please try again later', 'RT_UG_4002'));
+			return next(err || new APIError(403, 'error in fetching user. please try again later.', 'RT_UG_4002'));
 		}
 		req.result = result;
 		return next();
@@ -56,14 +56,14 @@ user.get = function(req, res, next) {
 
 user.loginVerify = function(req, res, next) {
 	if(req.body.password !== req.result.password) {
-		return next(new APIError(401, 'wrong password..plase try again','RT_ULV_4000'));
+		return next(new APIError(401, 'Please Enter Right Password.','RT_ULV_4000'));
 	}
 	return next();
 };
 
 user.verify = function(req, res, next) {
 	if(!req.session || !req.session.user || !req.session.user.loggedIn) {
-		return next(new APIError(401, 'please login again to continue', 'RT_UV_4000'));
+		return next(new APIError(401, 'please login again to continue.', 'RT_UV_4000'));
 	}
 	return next();
 };
