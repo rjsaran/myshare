@@ -7,8 +7,10 @@ var debug = require('debug')('model:base');
 sql.setDialect('mysql');
 
 function Model(schema, dbConfig) {
+	dbConfig.connectionLimit = 10;
+
 	this.table = sql.define(schema);
-	this.conn = mysql.createConnection(dbConfig);
+	this.conn = mysql.createPool(dbConfig);
 }
 
 Model.prototype = {
