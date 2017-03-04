@@ -24,6 +24,7 @@ app.set('port', port)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -34,15 +35,11 @@ app.use(session({
   saveUninitialized: true,
   key: 'myShare.sid',
   secret: 'myshare',
-  store: new RedisStore({
-    host: config.session.host,
-    port: config.session.port,
-    ttl: 2*24*60*60
-  })
+  store: new RedisStore(config.session)
 }));
 
 
-if (env.toLowerCase() === 'production') {  
+if (env.toLowerCase() === 'production') {
   logger.token('istDate', function () {
     return new Date();
   });
@@ -50,7 +47,6 @@ if (env.toLowerCase() === 'production') {
   app.use(logger('dev'));
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(router);
 
 require('./routes')(router);
