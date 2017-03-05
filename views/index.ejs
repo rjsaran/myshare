@@ -98,12 +98,12 @@
                         <td>
                             <span >{{share.description}}</span>
                         </td>
-                        <td ng-if="isAdmin">
+                        <td ng-if="share.owner">
                             <button type="button" class="btn btn-success"  ng-click="editShare(share.id)">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button> 
                         </td>
-                        <td ng-if="isAdmin">
+                        <td ng-if="share.owner">
                             <button type ="button" class="btn btn-danger" ng-click="deleteShare(share.id)">
                                 <span class="glyphicon glyphicon-trash"></span>
                              </button> 

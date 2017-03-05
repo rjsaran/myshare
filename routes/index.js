@@ -26,6 +26,6 @@ module.exports = function(app) {
   .get('/share', user.verify, share.get, share.response, error)
   .get('/share/summary', user.verify, share.summary, share.response, error)
   .post('/share', user.verify, share.insert, share.response, error)
-  .put('/share/:id', user.verify, user.isAdmin, share.update, share.response, error)
-  .delete('/share/:id', user.verify, user.isAdmin, share.del, share.response, error);
+  .put('/share/:id', user.verify, share.hasPermission, share.update, share.response, error)
+  .delete('/share/:id', user.verify, share.hasPermission, share.del, share.response, error);
 };

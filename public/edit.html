@@ -16,6 +16,19 @@
                   <input type="text" class="form-control" value="{{formData.amount}}" ng-model="formData.amount" required>
               </div>
               <br>
+              <label> Distribute Among: </label>
+              <br>
+              <div class="form-group">
+                <input type="checkbox" ng-click="toggleShareAmong(true, true)" ng-model="formData.allUserSelected">
+                <span>All</span>
+              </div>
+              <div ng-repeat="user in users">
+                <div class="form-group">
+                    <input type="checkbox" ng-click="toggleShareAmong(false, true)" ng-model="user.selected">
+                    <span>{{user.name}}</span>
+                </div>
+              </div>
+              <br>
               <button type="submit" class="btn btn-success btn-lg" ng-click="updateShare(formData.id)">Update</button>
           </form>
         </div>

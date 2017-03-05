@@ -103,16 +103,10 @@ user.getSession = function(req, res, next) {
 	res.json(req.session && req.session.user);
 };
 
-user.isAdmin = function(req, res, next) {
-	if(!req.session || !req.session.user || !req.session.user.type) {
-		return next(new APIError(411, 'you don\'t have permission ', 'RT_UV_4000'));
-	}
-	return next();
-};
 
 user.response = function(req, res, next) {
 	var response = {};
-	['id', 'name', 'email', 'type'].forEach(function(e){
+	['id', 'name', 'email'].forEach(function(e){
 		if(req.result && req.result[e] !== undefined) {
 			response[e] = req.result[e];
 		}

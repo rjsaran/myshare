@@ -11,7 +11,6 @@ var schema = {
 		'user_id',
 		'amount',
 		'status',
-		'isAmongAll',
 		'distribute_among',
 		'created_at',
 		'updated_at'

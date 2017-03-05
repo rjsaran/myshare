@@ -56,7 +56,7 @@ share.insert = function(input, cb) {
 	var mandatoryFields = ['description', 'user_id', 'amount'];
 	var options = {};
 	var err;
-	['user_id', 'amount', 'status', 'isAmongAll'].forEach(function(e) {
+	['user_id', 'amount', 'status'].forEach(function(e) {
 		if(input[e] !== undefined && !isNaN(Number(input[e]))) { 
 			options[e] = Number(input[e]); 
 		}
@@ -101,6 +101,11 @@ share.update = function(input, cb) {
 			options[e] = input[e]; 
 		}
 	});
+
+	if(input.distribute_among && input.distribute_among.length) {
+		options.distribute_among = input.distribute_among.join(',');
+	}
+	
 	if(!Object.keys(options) || !Object.keys(options).length) {
 		return cb(new APIError(409, ' nothing to update', 'API_SU_4000'));
 	}

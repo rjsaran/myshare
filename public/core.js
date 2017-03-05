@@ -11,7 +11,6 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     $scope.summaryTotal = 0;
     $scope.perPerson = 0;
     $scope.user = {};
-    $scope.isAdmin = false;
     $scope.users = {};
     $scope.tHead = ['Date', 'AMOUNT', 'BY', 'DESCRIPTION'];
     $scope.summaryThead = ['Name', 'Paid', 'Balance'];
@@ -62,7 +61,6 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
         $http.get('/user/session')
             .success(function(data) {
                 $scope.user = data;
-                $scope.isAdmin = !!data.type;
                 return cb();
             })
             .error(function() {
@@ -174,27 +172,44 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     
     $scope.addNew = function() {
         $scope.newformData = {};
+
+        $scope.users.forEach(function(user) {
+            user.selected = false;
+        });
+
         loadDatePicker(function() {
             angular.element('#createModal').modal('show');
         })
     };
     
     $scope.editShare = function(id) {
-        $scope.shares.forEach(function(share) {
-            if(share.id == id) {
-                 $scope.formData = {
-                     id: share.id,
-                     description: share.description,
-                     amount: share.amount
-                 };
+        $scope.formData = $scope.shares.filter(function(share) {
+            return share.id == id;
+        })[0];
+
+        $scope.formData.allUserSelected = true;
+
+        $scope.users.forEach(function(user) {
+            if($scope.formData.distribute_among.indexOf(user.id) > -1) {
+                user.selected = true;
+            } else {
+                user.selected = false;
+                $scope.formData.allUserSelected = false;
             }
         });
+
         angular.element("#editModal").modal('show');
     };
     
     // when submitting the add form, send the text to the node API
     $scope.createShare = function() {
         var data = $scope.newformData;
+        data.selectedUsers = $scope.users.map(function(user) {
+            if(user.selected) {
+                return Number(user.id);
+            }
+        }).filter(Number);
+
         $http.post('/share', data)
             .success(function() {
                 $scope.isSuccess = true;
@@ -207,6 +222,8 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
             .error(function(err, status) {
                 // not authorized
                 $scope.isSuccess = false;
+                angular.element('#createModal').modal('hide');
+
                  switch (status) {
                     case 401:
                         window.location = '/login';
@@ -221,6 +238,12 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
     // mark complete a todo after checking it
     $scope.updateShare = function(id) {
         var data = $scope.formData;
+        data.selectedUsers = $scope.users.map(function(user) {
+            if(user.selected) {
+                return Number(user.id);
+            }
+        }).filter(Number);
+
         $http.put('/share/' + id, data)
             .success(function() {
                $scope.isSuccess = true;
@@ -233,6 +256,9 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
             .error(function(err, status) {
                 // not authorized
                 $scope.isSuccess = false;
+
+                angular.element('#editModal').modal('hide'); 
+
                  switch (status) {
                     case 401:
                         window.location = '/login';
@@ -275,13 +301,14 @@ myShare.controller('mainController', function($scope, $http, $timeout) {
         }
     };
     
-    $scope.toggleAll = function() {
-        var users = $scope.users;
-        $scope.newformData.selectedUser = {};
-        users.forEach(function(user) {
-            var uid = user.id;
-            $scope.newformData.selectedUser[uid] = !!$scope.newformData.selectedUserAll;
-        });
+    $scope.toggleShareAmong = function(isAll, update) {
+        if(isAll) {
+            $scope.users.forEach(function(user) {
+                user.selected = update ? !!$scope.formData.allUserSelected : !!$scope.newformData.allUserSelected;
+            });
+        } else {
+            update ? ($scope.formData.allUserSelected = false) : $scope.newformData.allUserSelected = false;
+        }
     };
     
     $scope.logout = function() {

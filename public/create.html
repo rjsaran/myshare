@@ -30,12 +30,12 @@
               <label> Distribute Among: </label>
               <br>
               <div class="form-group">
-                <input type="checkbox" ng-click="toggleAll()" ng-model="newformData.selectedUserAll">
-                <span>all</span>
+                <input type="checkbox" ng-click="toggleShareAmong(true, false)" ng-model="newformData.allUserSelected">
+                <span>All</span>
               </div>
               <div ng-repeat="user in users">
                 <div class="form-group">
-                    <input type="checkbox"  ng-model="newformData.selectedUser[user.id]">
+                    <input type="checkbox" ng-click="toggleShareAmong(false, false)" ng-model="user.selected">
                     <span>{{user.name}}</span>
                 </div>
               </div>

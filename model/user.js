@@ -9,7 +9,6 @@ var schema = {
 		'id',
 		'name',
 		'email',
-		'type',
 		'password',
 		'created_at',
 		'updated_at'
