@@ -73,7 +73,6 @@ user.buildSession = function(req, res, next) {
 		name: req.result.name,
 		email: req.result.email,
 		id: req.result.id,
-		type: req.result.type,
 		loggedIn: true
 	};
 	return next();

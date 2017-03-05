@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 app.use(session({
   resave: true,
-  saveUninitialized: true,
+  saveUninitialized: false,
   key: 'myShare.sid',
   secret: 'myshare',
   store: new RedisStore(config.session)
