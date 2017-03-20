@@ -7,7 +7,20 @@ var send_ok = function(req, res, next) {
   res.sendStatus(200);
 };
 
+var i = 0;
+
 module.exports = function(app) {
+
+
+  // For testing purpose of our android app
+  app.get('/get', function(req, res, next) {
+    res.json({value: i});
+  });
+
+  app.all('/incr', function(req, res, next) {
+    i += Number(req.query.value) || 1;
+    res.json({message: 'SUCCESS'});
+  });
   //check if server's health is good or not
   app.get('/_status', send_ok);
  
