@@ -3,6 +3,6 @@
 module.exports = {
 	host: 'localhost',
 	user: 'root',
-	password: 'paytm@197',
+	password: '*****',
 	database: 'myshare'
 };
